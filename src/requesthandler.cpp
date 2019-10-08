@@ -134,7 +134,7 @@ void RequestHandler::handleRequest(ConnectionInfo &conInfo)
         ret["type"] = Converter::codeToString(AUTHENTIFICATION_ERROR);
     }
     else if (testURIWithPattern(parsedURI, p_image)
-        && conInfo.connectionType == PUT)
+        && conInfo.connectionType == POST)
     {
         u_int32_t i_imageId = atoi(parsedURI[2].c_str());
 
@@ -180,7 +180,7 @@ void RequestHandler::handleRequest(ConnectionInfo &conInfo)
         ret["image_id"] = Json::Value(i_imageId);
     }
     else if (testURIWithPattern(parsedURI, p_tag)
-             && conInfo.connectionType == PUT)
+             && conInfo.connectionType == POST)
     {
         u_int32_t i_imageId = atoi(parsedURI[2].c_str());
 
