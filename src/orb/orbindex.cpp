@@ -134,7 +134,7 @@ u_int32_t ORBIndex::addImage(string i_imageId, list<HitForward> hitList)
             forwardIndex[hitFor.i_imageId].push_back(hitFor.i_wordId);
         }
         indexHits[hitFor.i_wordId].push_back(hitBack);
-        //nbWords[hitFor.i_imageId]++;
+        nbWords[hitFor.i_imageId]++;
         nbOccurences[hitFor.i_wordId]++;
         totalNbRecords++;
     }
@@ -479,7 +479,7 @@ u_int32_t ORBIndex::load(string backwardIndexPath)
         totalNbRecords = 0;
         while (true)
         {
-            u_int32_t i_imageId;
+            string i_imageId;
             u_int16_t i_angle, x, y;
             indexAccess.read((char *)&i_imageId, sizeof(u_int32_t));
             if (indexAccess.endOfIndex())
@@ -487,7 +487,7 @@ u_int32_t ORBIndex::load(string backwardIndexPath)
             indexAccess.read((char *)&i_angle, sizeof(u_int16_t));
             indexAccess.read((char *)&x, sizeof(u_int16_t));
             indexAccess.read((char *)&y, sizeof(u_int16_t));
-            //nbWords[i_imageId]++;
+            nbWords[i_imageId]++;
             totalNbRecords++;
         }
 
