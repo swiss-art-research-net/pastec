@@ -35,10 +35,10 @@ class ClientConnection;
 
 struct SearchRequest
 {
-    u_int32_t imageId;
+    string imageId;
     vector<char> imageData;
     ClientConnection *client;
-    vector<u_int32_t> results;
+    vector<string> results;
     vector<Rect> boundingRects;
     vector<float> scores;
     vector<string> tags;

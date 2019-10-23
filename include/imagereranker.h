@@ -43,8 +43,8 @@ class ImageReranker
 {
 public:
     ImageReranker() {}
-    void rerank(std::unordered_map<u_int32_t, list<Hit> > &imagesReqHits,
-                std::unordered_map<u_int32_t, vector<Hit> > &indexHits,
+    void rerank(std::unordered_map<unsigned, list<Hit> > &imagesReqHits,
+                std::unordered_map<unsigned, vector<Hit> > &indexHits,
                 priority_queue<SearchResult> &rankedResultsIn,
                 priority_queue<SearchResult> &rankedResultsOut,
                 unsigned i_nbResults);
@@ -52,7 +52,7 @@ public:
 private:
     float angleDiff(unsigned i_angle1, unsigned i_angle2);
     void getFirstImageIds(priority_queue<SearchResult> &rankedResultsIn,
-                          unsigned i_nbResults, unordered_set<u_int32_t> &firstImageIds);
+                          unsigned i_nbResults, unordered_set<string> &firstImageIds);
 };
 
 
@@ -87,7 +87,7 @@ class RANSACThread : public Thread
 {
 public:
     RANSACThread(pthread_mutex_t &mutex,
-                 std::unordered_map<u_int32_t, RANSACTask> &imgTasks,
+                 std::unordered_map<string, RANSACTask> &imgTasks,
                  priority_queue<SearchResult> &rankedResultsOut)
         : mutex(mutex), imgTasks(imgTasks), rankedResultsOut(rankedResultsOut)
     { }
@@ -96,9 +96,9 @@ public:
     void *run();
 
     pthread_mutex_t &mutex;
-    std::unordered_map<u_int32_t, RANSACTask> &imgTasks;
+    std::unordered_map<string, RANSACTask> &imgTasks;
     priority_queue<SearchResult> &rankedResultsOut;
-    deque<unsigned> imageIds;
+    deque<string> imageIds;
     deque<Histogram> histograms;
 
 private:

@@ -66,15 +66,16 @@ ORBIndex::~ORBIndex()
 }
 
 
-void ORBIndex::getImagesWithVisualWords(unordered_map<u_int32_t, list<Hit> > &imagesReqHits,
-                                     unordered_map<u_int32_t, vector<Hit> > &indexHitsForReq)
+void ORBIndex::getImagesWithVisualWords(unordered_map<unsigned, list<Hit> > &imagesReqHits,
+                                     unordered_map<unsigned, vector<Hit> > &indexHitsForReq)
 {
-    pthread_rwlock_rdlock(&rwLock);
 
-    for (unordered_map<u_int32_t, list<Hit> >::const_iterator it = imagesReqHits.begin();
+    pthread_rwlock_rdlock(&rwLock);
+    for (unordered_map<unsigned, list<Hit> >::const_iterator it = imagesReqHits.begin();
          it != imagesReqHits.end(); ++it)
     {
         const unsigned i_wordId = it->first;
+
         indexHitsForReq[i_wordId] = indexHits[i_wordId];
     }
 
@@ -88,7 +89,7 @@ void ORBIndex::getImagesWithVisualWords(unordered_map<u_int32_t, list<Hit> > &im
  * @return the number of words.
  * readLock() and unlock MUST be called before and after calling this function.
  */
-unsigned ORBIndex::countTotalNbWord(unsigned i_imageId)
+unsigned ORBIndex::countTotalNbWord(string i_imageId)
 {
     unsigned i_ret = nbWords[i_imageId];
     return i_ret;
@@ -108,7 +109,7 @@ unsigned ORBIndex::getTotalNbIndexedImages()
  * @brief Add a list of hits to the index.
  * @param  the list of hits.
  */
-u_int32_t ORBIndex::addImage(unsigned i_imageId, list<HitForward> hitList)
+u_int32_t ORBIndex::addImage(string i_imageId, list<HitForward> hitList)
 {
     pthread_rwlock_wrlock(&rwLock);
     if (nbWords.find(i_imageId) != nbWords.end())
@@ -133,7 +134,7 @@ u_int32_t ORBIndex::addImage(unsigned i_imageId, list<HitForward> hitList)
             forwardIndex[hitFor.i_imageId].push_back(hitFor.i_wordId);
         }
         indexHits[hitFor.i_wordId].push_back(hitBack);
-        nbWords[hitFor.i_imageId]++;
+        //nbWords[hitFor.i_imageId]++;
         nbOccurences[hitFor.i_wordId]++;
         totalNbRecords++;
     }
@@ -151,7 +152,7 @@ u_int32_t ORBIndex::addImage(unsigned i_imageId, list<HitForward> hitList)
  * @brief Add a string tag to an image.
  * @param  the tag to add.
  */
-u_int32_t ORBIndex::addTag(const unsigned i_imageId, const string tag)
+u_int32_t ORBIndex::addTag(const string i_imageId, const string tag)
 {
     pthread_rwlock_wrlock(&rwLock);
 
@@ -175,13 +176,13 @@ u_int32_t ORBIndex::addTag(const unsigned i_imageId, const string tag)
  * @param i_imageId the image id.
  * @return true on success else false.
  */
-u_int32_t ORBIndex::removeImage(const unsigned i_imageId)
+u_int32_t ORBIndex::removeImage(const string i_imageId)
 {
     // First remove the image tag if there is one.
-    removeTag((u_int64_t)i_imageId);
+    removeTag(i_imageId);
 
     pthread_rwlock_wrlock(&rwLock);
-    unordered_map<u_int64_t, unsigned>::iterator imgIt =
+    unordered_map<string, unsigned>::iterator imgIt =
         nbWords.find(i_imageId);
 
     if (imgIt == nbWords.end())
@@ -195,7 +196,7 @@ u_int32_t ORBIndex::removeImage(const unsigned i_imageId)
 
     if (buildForwardIndex)
     {
-        unordered_map<u_int64_t, vector<unsigned> >::iterator forwardIndexIt =
+        unordered_map<string, vector<unsigned> >::iterator forwardIndexIt =
             forwardIndex.find(i_imageId);
 
         if (forwardIndexIt == forwardIndex.end())
@@ -237,7 +238,7 @@ u_int32_t ORBIndex::removeImage(const unsigned i_imageId)
  * @brief Get a list of hits associated with an image id.
  * @param  the list of hits.
  */
-u_int32_t ORBIndex::getImageWords(unsigned i_imageId, unordered_map<u_int32_t, list<Hit> > &hitList)
+u_int32_t ORBIndex::getImageWords(string i_imageId, unordered_map<unsigned, list<Hit> > &hitList)
 {
     pthread_rwlock_wrlock(&rwLock);
 
@@ -246,7 +247,7 @@ u_int32_t ORBIndex::getImageWords(unsigned i_imageId, unordered_map<u_int32_t, l
                                        0.15 * i_nbTotalIndexedImages
                                        : i_nbTotalIndexedImages;
 
-    unordered_map<u_int64_t, unsigned>::iterator imgIt =
+    unordered_map<string, unsigned>::iterator imgIt =
         nbWords.find(i_imageId);
 
     if (imgIt == nbWords.end())
@@ -316,11 +317,11 @@ u_int32_t ORBIndex::getImageWords(unsigned i_imageId, unordered_map<u_int32_t, l
 /**
  * @brief Remove a string tag to an image.
  */
-u_int32_t ORBIndex::removeTag(const unsigned i_imageId)
+u_int32_t ORBIndex::removeTag(const string i_imageId)
 {
     pthread_rwlock_wrlock(&rwLock);
 
-    unordered_map<u_int32_t, string>::iterator tagIt =
+    unordered_map<string, string>::iterator tagIt =
         tags.find(i_imageId);
 
     if (tagIt == tags.end()) {
@@ -343,11 +344,11 @@ u_int32_t ORBIndex::removeTag(const unsigned i_imageId)
  * @param the image id,
  * @param the returned tag.
  */
-u_int32_t ORBIndex::getTag(const unsigned i_imageId, string &tag)
+u_int32_t ORBIndex::getTag(const string i_imageId, string &tag)
 {
     pthread_rwlock_rdlock(&rwLock);
 
-    unordered_map<u_int32_t, string>::iterator tagIt =
+    unordered_map<string, string>::iterator tagIt =
         tags.find(i_imageId);
 
     if (tagIt == tags.end()) {
@@ -486,7 +487,7 @@ u_int32_t ORBIndex::load(string backwardIndexPath)
             indexAccess.read((char *)&i_angle, sizeof(u_int16_t));
             indexAccess.read((char *)&x, sizeof(u_int16_t));
             indexAccess.read((char *)&y, sizeof(u_int16_t));
-            nbWords[i_imageId]++;
+            //nbWords[i_imageId]++;
             totalNbRecords++;
         }
 
@@ -515,10 +516,10 @@ u_int32_t ORBIndex::load(string backwardIndexPath)
                 hits[i].x = x;
                 hits[i].y = y;
 
-                if (buildForwardIndex)
-                {
-                    forwardIndex[i_imageId].push_back(i_wordId);
-                }
+                //if (buildForwardIndex)
+                //{
+                //    forwardIndex[i_imageId].push_back(i_wordId);
+                //}
             }
         }
 
@@ -559,7 +560,7 @@ u_int32_t ORBIndex::loadTags(string indexTagsPath)
     while (true)
     {
         // Read the image tag.
-        u_int32_t i_imageId;
+        string i_imageId;
         u_int32_t i_tagSize;
         ifs.read((char *)&i_imageId, sizeof(u_int32_t));
         if (ifs.eof())
@@ -603,10 +604,10 @@ u_int32_t ORBIndex::writeTags(string indexTagsPath)
 
     cout << "Writing the index image tags." << endl;
 
-    for (unordered_map<u_int32_t, string>::const_iterator it = tags.begin();
+    for (unordered_map<string, string>::const_iterator it = tags.begin();
          it != tags.end(); ++it)
     {
-        u_int32_t i_imageId = it->first;
+        string i_imageId = it->first;
         const char *psz_tag = it->second.c_str();
         u_int32_t i_tagSize = strlen(psz_tag) + 1;
 
@@ -631,10 +632,10 @@ u_int32_t ORBIndex::writeTags(string indexTagsPath)
  * @param imageIds the vector to return the images ids.
  * @return the operation code.
  */
-u_int32_t ORBIndex::getImageIds(vector<u_int32_t> &imageIds)
+u_int32_t ORBIndex::getImageIds(vector<string> &imageIds)
 {
     imageIds.reserve(nbWords.size());
-    for (unordered_map<u_int64_t, unsigned>::const_iterator it = nbWords.begin();
+    for (unordered_map<string, unsigned>::const_iterator it = nbWords.begin();
          it != nbWords.end(); ++it)
         imageIds.push_back(it->first);
 
