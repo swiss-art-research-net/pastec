@@ -25,11 +25,11 @@
 #include <opencv2/core/core.hpp>
 
 using namespace cv;
-
+using namespace std;
 
 struct SearchResult
 {
-    SearchResult(float f_weight, unsigned i_imageId, Rect boundingRect)
+    SearchResult(float f_weight, string i_imageId, Rect boundingRect)
         : f_weight(f_weight), i_imageId(i_imageId),
           boundingRect(boundingRect)
     {}
@@ -40,7 +40,7 @@ struct SearchResult
     }
 
     float f_weight;
-    unsigned i_imageId;
+    string i_imageId;
     Rect boundingRect;
 };
 

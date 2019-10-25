@@ -36,7 +36,7 @@ ORBFeatureExtractor::ORBFeatureExtractor(ORBIndex *index, ORBWordIndex *wordInde
 { }
 
 
-u_int32_t ORBFeatureExtractor::processNewImage(unsigned i_imageId, unsigned i_imgSize,
+u_int32_t ORBFeatureExtractor::processNewImage(string i_imageId, unsigned i_imgSize,
                                                char *p_imgData, unsigned &i_nbFeaturesExtracted)
 {
     Mat img;

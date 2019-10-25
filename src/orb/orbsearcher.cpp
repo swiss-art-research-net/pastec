@@ -63,7 +63,7 @@ class RankingThread : public Thread
 {
 public:
     RankingThread(ORBIndex *index, const unsigned i_nbTotalIndexedImages,
-                  std::unordered_map<u_int32_t, vector<Hit> > &indexHits)
+                  std::unordered_map<unsigned, vector<Hit> > &indexHits)
         : index(index), i_nbTotalIndexedImages(i_nbTotalIndexedImages),
           indexHits(indexHits) { }
 
@@ -98,9 +98,9 @@ public:
 
     ORBIndex *index;
     const unsigned i_nbTotalIndexedImages;
-    std::unordered_map<u_int32_t, vector<Hit> > &indexHits;
+    std::unordered_map<unsigned, vector<Hit> > &indexHits;
     deque<u_int32_t> wordIds;
-    std::unordered_map<u_int32_t, float> weights; // key: image id, value: image score.
+    std::unordered_map<string, float> weights; // key: image id, value: image score.
 };
 
 
@@ -136,7 +136,7 @@ u_int32_t ORBSearcher::searchImage(SearchRequest &request)
                                        0.15 * i_nbTotalIndexedImages
                                        : i_nbTotalIndexedImages;
 
-    std::unordered_map<u_int32_t, list<Hit> > imageReqHits; // key: visual word, value: the found angles
+    std::unordered_map<unsigned, list<Hit> > imageReqHits; // key: visual word, value: the found angles
     for (unsigned i = 0; i < keypoints.size(); ++i)
     {
         #define NB_NEIGHBORS 1
@@ -157,7 +157,7 @@ u_int32_t ORBSearcher::searchImage(SearchRequest &request)
             {
                 // Convert the angle to a 16 bit integer.
                 Hit hit;
-                hit.i_imageId = 0;
+                hit.i_imageId = '0';
                 hit.i_angle = keypoints[i].angle / 360 * (1 << 16);
                 hit.x = keypoints[i].pt.x;
                 hit.y = keypoints[i].pt.y;
@@ -186,7 +186,7 @@ u_int32_t ORBSearcher::searchSimilar(SearchRequest &request)
     cout << "Loading the image words from the index." << endl;
 
     // key: visual word, value: the found angles
-    std::unordered_map<u_int32_t, list<Hit> > imageReqHits;
+    std::unordered_map<unsigned, list<Hit> > imageReqHits;
     u_int32_t i_ret = index->getImageWords(request.imageId, imageReqHits);
 
     if (i_ret != OK)
@@ -200,7 +200,7 @@ u_int32_t ORBSearcher::searchSimilar(SearchRequest &request)
 
 
 u_int32_t ORBSearcher::processSimilar(SearchRequest &request,
-        std::unordered_map<u_int32_t, list<Hit> > imageReqHits)
+        std::unordered_map<unsigned, list<Hit> > imageReqHits)
 {
     timeval t[7];
     gettimeofday(&t[0], NULL);
@@ -210,7 +210,7 @@ u_int32_t ORBSearcher::processSimilar(SearchRequest &request,
     cout << imageReqHits.size() << " visual words kept for the request." << endl;
     cout << i_nbTotalIndexedImages << " images indexed in the index." << endl;
 
-    std::unordered_map<u_int32_t, vector<Hit> > indexHits; // key: visual word id, values: index hits.
+    std::unordered_map<unsigned, vector<Hit> > indexHits; // key: visual word id, values: index hits.
     indexHits.rehash(imageReqHits.size());
     index->getImagesWithVisualWords(imageReqHits, indexHits);
 
@@ -248,10 +248,10 @@ u_int32_t ORBSearcher::processSimilar(SearchRequest &request,
     cout << "compute time: " << getTimeDiff(t[2], t[3]) << " ms." << endl;
 
     // Reduce...
-    std::unordered_map<u_int32_t, float> weights; // key: image id, value: image score.
+    std::unordered_map<string, float> weights; // key: image id, value: image score.
     weights.rehash(i_nbTotalIndexedImages);
     for (unsigned i = 0; i < NB_RANKING_THREAD; ++i)
-        for (std::unordered_map<u_int32_t, float>::const_iterator it = threads[i]->weights.begin();
+        for (std::unordered_map<string, float>::const_iterator it = threads[i]->weights.begin();
             it != threads[i]->weights.end(); ++it)
             weights[it->first] += it->second;
 
@@ -265,7 +265,7 @@ u_int32_t ORBSearcher::processSimilar(SearchRequest &request,
     index->unlock();
 
     priority_queue<SearchResult> rankedResults;
-    for (std::unordered_map<unsigned, float>::const_iterator it = weights.begin();
+    for (std::unordered_map<string, float>::const_iterator it = weights.begin();
          it != weights.end(); ++it)
     {
         //cout << "Second: " << it->second << " First: " << it->first << endl;
@@ -299,7 +299,7 @@ u_int32_t ORBSearcher::processSimilar(SearchRequest &request,
 void ORBSearcher::returnResults(priority_queue<SearchResult> &rankedResults,
                                   SearchRequest &req, unsigned i_maxNbResults)
 {
-    list<u_int32_t> imageIds;
+    list<string> imageIds;
 
     unsigned i_res = 0;
     while(!rankedResults.empty()
