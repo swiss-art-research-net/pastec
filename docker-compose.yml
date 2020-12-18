@@ -9,3 +9,5 @@ services:
     ports:
       - '4212:4212'
     restart: always
+    volumes:
+      - ~/pastec-index:/pastec-index:rw
