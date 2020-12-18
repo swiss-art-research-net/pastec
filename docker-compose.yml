@@ -11,3 +11,5 @@ services:
     restart: always
     volumes:
       - ~/pastec-index:/pastec/build/pastec-index:rw
+    command:
+      - curl -X POST -d '{"type":"LOAD", "index_path":"/pastec/build/pastec-index/pharos.dat"}' http://127.0.0.1:4212/index/io
