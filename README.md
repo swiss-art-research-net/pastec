@@ -2,6 +2,7 @@ Pastec
 ======
 
 To use docker-compose:
+
 $ ` docker compose up -d `
 
 For docker build:
