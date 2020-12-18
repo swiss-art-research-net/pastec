@@ -1,11 +1,15 @@
 Pastec
 ======
 
+To use docker-compose:
+
+$ ` docker compose up -d `
+
 For docker build:
 
-$ docker build --tag pastec:1.0 .
+$ ` docker build --tag pastec:1.0 . `
 
-$ docker run -p 4212:4212 -d -name pastec pastec:1.0
+$ ` docker run -p 4212:4212 -d -name pastec pastec:1.0 `
 
 Introduction
 ------------

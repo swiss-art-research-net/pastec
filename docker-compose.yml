@@ -1,0 +1,11 @@
+
+version: '3.5'
+services:
+  pastec:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    ports:
+      - '4212:4212'
+    restart: always
