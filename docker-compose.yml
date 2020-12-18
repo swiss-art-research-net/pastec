@@ -11,5 +11,10 @@ services:
     restart: always
     volumes:
       - ~/pastec-index:/pastec/build/pastec-index:rw
-    environment:
-      DOCKER_ON_RUN: curl -X POST -d '{"type":"LOAD", "index_path":"/pastec/build/pastec-index/pharos.dat"}' http://127.0.0.1:4212/index/io
+    command:
+    	- curl 
+    	- -X 
+    	- POST 
+    	- -d 
+	    - '{\"type\":\"LOAD\", \"index_path\":\"/pastec/build/pastec-index/pharos.dat\"}'
+	    - http://127.0.0.1:4212/index/io
