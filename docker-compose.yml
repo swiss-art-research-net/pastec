@@ -9,7 +9,7 @@ services:
       - '4212:4212'
     restart: always
     volumes:
-      - C:\Users\mafragias\opt\pastec-index:/pastec/build/pastec-index:rw
+      - ~/pastec-index:/pastec/build/pastec-index:rw
     command:
       - /bin/sh 
       - -c
