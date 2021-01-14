@@ -136,7 +136,7 @@ void RequestHandler::handleRequest(ConnectionInfo &conInfo)
     else if (testURIWithPattern(parsedURI, p_image)
         && conInfo.connectionType == POST)
     {
-        string i_imageId = parsedURI[2].c_str();
+        u_int32_t i_imageId = atoi(parsedURI[2].c_str());
 
         unsigned i_nbFeaturesExtracted;
         u_int32_t i_ret = featureExtractor->processNewImage(
@@ -173,7 +173,7 @@ void RequestHandler::handleRequest(ConnectionInfo &conInfo)
     else if (testURIWithPattern(parsedURI, p_image)
              && conInfo.connectionType == DELETE)
     {
-        string i_imageId = parsedURI[2].c_str();
+        u_int32_t i_imageId = atoi(parsedURI[2].c_str());
 
         u_int32_t i_ret = index->removeImage(i_imageId);
         ret["type"] = Converter::codeToString(i_ret);
@@ -182,7 +182,7 @@ void RequestHandler::handleRequest(ConnectionInfo &conInfo)
     else if (testURIWithPattern(parsedURI, p_tag)
              && conInfo.connectionType == POST)
     {
-        string i_imageId = parsedURI[2].c_str();
+        u_int32_t i_imageId = atoi(parsedURI[2].c_str());
 
         string dataStr(conInfo.uploadedData.begin(),
                        conInfo.uploadedData.end());
@@ -194,7 +194,7 @@ void RequestHandler::handleRequest(ConnectionInfo &conInfo)
     else if (testURIWithPattern(parsedURI, p_tag)
              && conInfo.connectionType == DELETE)
     {
-        string i_imageId = parsedURI[2].c_str();
+        u_int32_t i_imageId = atoi(parsedURI[2].c_str());
 
         u_int32_t i_ret = index->removeTag(i_imageId);
 
@@ -336,7 +336,7 @@ void RequestHandler::handleRequest(ConnectionInfo &conInfo)
     else if (testURIWithPattern(parsedURI, p_imageIds)
              && conInfo.connectionType == GET)
     {
-        vector<string> imageIds;
+        vector<u_int32_t> imageIds;
         u_int32_t i_ret = index->getImageIds(imageIds);
 
         ret["type"] = Converter::codeToString(i_ret);

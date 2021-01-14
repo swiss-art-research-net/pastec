@@ -9,15 +9,9 @@ services:
       - '4212:4212'
     restart: always
     volumes:
-      - ~/pastec-index:/pastec/build/pastec-index:rw
+      - ./../pastec-index:/pastec/build/pastec-index:rw
     command:
       - /bin/sh 
       - -c
       - |
         ./pastec -p 4212 -i /pastec/build/pastec-index/pharos.dat /pastec/data/visualWordsORB.dat
-        #  pastec_load_indexes:
-        #    build:
-        # context: ./../pastec-index
-        # dockerfile: ./Dockerfile
-        # ports:
-        # - '3000:3000'

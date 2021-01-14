@@ -37,7 +37,7 @@ void *RANSACThread::run()
 {
     for (unsigned i = 0; i < imageIds.size(); ++i)
     {
-        const string i_imageId = imageIds[i];
+        const unsigned i_imageId = imageIds[i];
         const Histogram histogram = histograms[i];
         unsigned i_binMax = max_element(histogram.bins, histogram.bins + HISTOGRAM_NB_BINS) - histogram.bins;
         float i_maxVal = histogram.bins[i_binMax];
@@ -64,23 +64,23 @@ void *RANSACThread::run()
 }
 
 
-void ImageReranker::rerank(unordered_map<unsigned, list<Hit> > &imagesReqHits,
-                           unordered_map<unsigned, vector<Hit> > &indexHits,
+void ImageReranker::rerank(unordered_map<u_int32_t, list<Hit> > &imagesReqHits,
+                           unordered_map<u_int32_t, vector<Hit> > &indexHits,
                            priority_queue<SearchResult> &rankedResultsIn,
                            priority_queue<SearchResult> &rankedResultsOut,
                            unsigned i_nbResults)
 {
-    unordered_set<string> firstImageIds;
+    unordered_set<u_int32_t> firstImageIds;
 
     // Extract the first i_nbResults ranked images.
     getFirstImageIds(rankedResultsIn, i_nbResults, firstImageIds);
 
-    unordered_map<string, RANSACTask> imgTasks;
+    unordered_map<u_int32_t, RANSACTask> imgTasks;
 
     // Compute the histograms.
-    unordered_map<string, Histogram> histograms; // key: the image id, value: the corresponding histogram.
+    unordered_map<u_int32_t, Histogram> histograms; // key: the image id, value: the corresponding histogram.
 
-    for (unordered_map<unsigned, list<Hit> >::const_iterator it = imagesReqHits.begin();
+    for (unordered_map<u_int32_t, list<Hit> >::const_iterator it = imagesReqHits.begin();
          it != imagesReqHits.end(); ++it)
     {
         // Try to match all the visual words of the request image.
@@ -96,7 +96,7 @@ void ImageReranker::rerank(unordered_map<unsigned, list<Hit> > &imagesReqHits,
 
         for (unsigned i = 0; i < hitIndex.size(); ++i)
         {
-            const string i_imageId = hitIndex[i].i_imageId;
+            const u_int32_t i_imageId = hitIndex[i].i_imageId;
             // Test if the image belongs to the image to rerank.
             if (firstImageIds.find(i_imageId) != firstImageIds.end())
             {
@@ -128,10 +128,10 @@ void ImageReranker::rerank(unordered_map<unsigned, list<Hit> > &imagesReqHits,
 
     // Rank the images according to their histogram.
     unsigned i = 0;
-    for (unordered_map<string, Histogram>::iterator it = histograms.begin();
+    for (unordered_map<unsigned, Histogram>::iterator it = histograms.begin();
          it != histograms.end(); ++it, ++i)
     {
-        string i_imageId = it->first;
+        unsigned i_imageId = it->first;
         Histogram histogram = it->second;
         threads[i % NB_RANSAC_THREAD]->imageIds.push_back(i_imageId);
         threads[i % NB_RANSAC_THREAD]->histograms.push_back(histogram);
@@ -173,7 +173,7 @@ private:
  * @param firstImageIds a set to return the image ids.
  */
 void ImageReranker::getFirstImageIds(priority_queue<SearchResult> &rankedResultsIn,
-                                     unsigned i_nbResults, unordered_set<string> &firstImageIds)
+                                     unsigned i_nbResults, unordered_set<u_int32_t> &firstImageIds)
 {
     unsigned i_res = 0;
     while(!rankedResultsIn.empty()
