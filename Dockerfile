@@ -9,6 +9,7 @@ RUN git clone https://github.com/lklic/pastec.git /pastec
 RUN mkdir -p /pastec/build && mkdir /pastec/data
 WORKDIR /pastec/build
 
+
 RUN cmake ../ && make
 
 RUN cp /pastec/visualWordsORB.dat /pastec/data
