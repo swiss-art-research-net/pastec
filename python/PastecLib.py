@@ -67,7 +67,7 @@ class PastecConnection:
         print(ret)
         self.raiseExceptionIfNeeded(ret["type"])
 
-    def remvoveTag(self, imageId):
+    def removeTag(self, imageId):
         ret = self.request("index/images/%s/tag" % str(imageId), "DELETE")
         self.raiseExceptionIfNeeded(ret["type"])
 
@@ -151,7 +151,7 @@ class PastecConnection:
         elif val == "INDEX_TAGS_NOT_WRITTEN":
             raise PastecException("Index not written.")
 
-        elif val == "IMAGE_DOWNLOADER_HTTP_ERROR"
+        elif val == "IMAGE_DOWNLOADER_HTTP_ERROR":
             raise PastecException("HTTP error when downloading an image.")
 
     def loadFileData(self, filePath):
